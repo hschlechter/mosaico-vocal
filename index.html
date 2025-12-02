@@ -19,7 +19,7 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #000;
       color: #f5f5f5;
-      overflow: hidden; /* Sin scroll en desktop, lo cambiamos en mobile */
+      overflow: hidden;
     }
 
     body {
@@ -171,34 +171,69 @@
     /* --- Versión mobile / pantallas pequeñas --- */
     @media (max-width: 800px) {
       html, body {
-        height: auto;
-        min-height: 100%;
-        overflow-y: auto;           /* Permitimos scroll vertical en mobile */
+        height: 100%;
+        width: 100%;
+        overflow: hidden;              /* sin scroll, layout compacto */
       }
 
       body {
         display: flex;
-        flex-direction: column;     /* Panel arriba, canvas abajo */
+        flex-direction: column;        /* canvas y panel en columna */
       }
 
+      /* Canvas primero, grande */
+      .canvas-wrapper {
+        order: 0;
+        flex: 1 1 auto;
+        min-height: 60vh;              /* asegura espacio al mosaico */
+      }
+
+      /* Panel abajo, reducido */
       .side-panel {
-        min-height: auto;
-        padding: 1rem 1rem 0.75rem;
+        order: 1;
+        padding: 0.6rem 0.9rem 0.7rem;
+        gap: 0.4rem;
         border-right: none;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
+        border-bottom: none;
+        border-top: 1px solid rgba(255,255,255,0.12);
+        background: radial-gradient(circle at top, #222 0, #000 60%);
       }
 
-      .statement {
-        font-size: 0.78rem;
+      .title-block h1 {
+        font-size: 1rem;
+      }
+
+      .title-block h2 {
+        font-size: 0.75rem;
+      }
+
+      /* Ocultamos texto largo en mobile */
+      .meta,
+      .statement,
+      .footnote,
+      #transcriptLabel,
+      #transcript {
+        display: none;
+      }
+
+      /* Simplificamos instrucciones: sin lista larga */
+      .instructions ul {
+        display: none;
       }
 
       .instructions {
-        font-size: 0.78rem;
+        border-top: none;
+        padding-top: 0.2rem;
+        margin-top: 0;
+        font-size: 0.75rem;
       }
 
-      .canvas-wrapper {
-        flex: 1 1 auto;
-        min-height: 50vh;          /* Asegura espacio para ver el mosaico */
+      .controls {
+        margin-top: 0.15rem;
+      }
+
+      #status {
+        font-size: 0.72rem;
       }
     }
   </style>
@@ -253,7 +288,9 @@
         ©️ 2025 Hans Schlechter. Alfabeto codificado en monogramas 2×3, código y visualidad interactiva
       </div>
       <div>
-        Esta obra está licenciada bajo <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es" target="_blank" rel="noreferrer">Creative Commons BY-NC-ND 4.0
+        Esta obra está licenciada bajo
+        <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es" target="_blank" rel="noreferrer">
+          Creative Commons BY-NC-ND 4.0
         </a>.
       </div>
       <div>
@@ -370,9 +407,13 @@
         "ü": "u"
       };
       if (accentMap[lower]) return accentMap[lower];
+
       if (lower === "ñ") return "ñ";
+
       if (lower >= "a" && lower <= "z") return lower;
+
       if ("¡!¿?.,0123456789".includes(ch)) return ch;
+
       return null;
     }
 
@@ -427,7 +468,7 @@
       wordLabelEl.textContent = word;
 
       const base = Math.min(canvas.width, canvas.height);
-      const cellSize = base / 20;
+      const cellSize = base / 20; // ajusta si quieres más grande/pequeño
       const gap = cellSize * 0.12;
 
       const cols = 3;
